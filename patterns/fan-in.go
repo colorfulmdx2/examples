@@ -1,9 +1,13 @@
 package patterns
 
 import "sync"
+import "fmt"
 
 func FanIn_MergeChannels(chs []chan int) chan int {
 	out := make(chan int)
+	a := 4
+	fmt.Println(a)
+
 	go func() {
 		// Create a WaitGroup to track all the goroutines
 		wg := &sync.WaitGroup{}
