@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-func WorkerPooling_CheckUrls(urls []string, wg *sync.WaitGroup, workers int) {
+func WorkerpoolingCheckurls(urls []string, wg *sync.WaitGroup, workers int) {
 	ch := make(chan string, workers)
 
 	for i := 0; i < workers; i++ {

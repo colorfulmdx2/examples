@@ -86,22 +86,3 @@ func (wp *WorkerPool) Wait() {
 		wp.wg.Wait()
 	})
 }
-
-//func main() {
-//
-//	maxWorkers := 3
-//	maxQueue := 100
-//
-//	pool := patterns.NewWorkerPool(maxWorkers, maxQueue)
-//	pool.Run()
-//	for i := 0; i <= 9; i++ {
-//		err := pool.AddTask(patterns.Task{ID: i})
-//		if err != nil {
-//			fmt.Println(err)
-//		}
-//	}
-//
-//	pool.Wait()
-//	fmt.Println("Done")
-//
-//}

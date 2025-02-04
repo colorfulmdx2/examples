@@ -1,28 +1,29 @@
 package main
 
-import (
-	"fmt"
-	"unsafe"
-)
-
-type Secret struct {
-	a int
-	b int
-}
+import "fmt"
 
 func main() {
-	s := Secret{10, 20}
-	// Get pointer to struct
-	ptr := unsafe.Pointer(&s)
-	fmt.Println(&s.a)
+	err := do()
+	if err != nil {
+		fmt.Println("ERROR")
+	} else {
+		fmt.Println("NO ERROR")
+	}
+}
 
-	fmt.Println(ptr)
+func do() error {
+	var p *MyError
+	if false {
+		p = &MyError{"error"}
+	}
 
-	// Get pointer to field `b` by adding an offset
-	pb := (*string)(unsafe.Add(ptr, unsafe.Offsetof(s.b)))
+	return p
+}
 
-	// Modify `b` directly in memory
-	*pb = "hhhh"
+type MyError struct {
+	msg string
+}
 
-	fmt.Println(s) // Output: {10 99}
+func (e MyError) Error() string {
+	return e.msg
 }
