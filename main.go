@@ -1,29 +1,78 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 func main() {
-	err := do()
-	if err != nil {
-		fmt.Println("ERROR")
-	} else {
-		fmt.Println("NO ERROR")
+	generator := func(done <-chan interface{}, integers ...int) <-chan int {
+		intStream := make(chan int)
+
+		go func() {
+			defer close(intStream)
+			for _, i := range integers {
+				select {
+				case <-done:
+					return
+				case intStream <- i:
+				}
+			}
+		}()
+
+		return intStream
 	}
-}
 
-func do() error {
-	var p *MyError
-	if false {
-		p = &MyError{"error"}
+	multiply := func(
+		done <-chan interface{},
+		intStream <-chan int,
+		multiplier int,
+	) <-chan int {
+		multipliedStream := make(chan int)
+
+		go func() {
+			defer close(multipliedStream)
+			for i := range intStream {
+				select {
+				case <-done:
+					return
+				case multipliedStream <- i * multiplier:
+				}
+			}
+		}()
+
+		return multipliedStream
+	}
+	add := func(
+		done <-chan interface{},
+		intStream <-chan int,
+		additive int,
+	) <-chan int {
+		addedStream := make(chan int)
+
+		go func() {
+			defer close(addedStream)
+			for i := range intStream {
+				select {
+				case <-done:
+					return
+				case addedStream <- i + additive:
+				}
+			}
+		}()
+
+		return addedStream
 	}
 
-	return p
-}
+	done := make(chan interface{})
+	defer close(done)
 
-type MyError struct {
-	msg string
-}
+	intStream := generator(done, 1, 2, 3, 4)
 
-func (e MyError) Error() string {
-	return e.msg
+	pipeline := multiply(done, add(done, multiply(done, intStream, 2), 1), 2)
+
+	for v := range pipeline {
+		time.Sleep(time.Second)
+		fmt.Println(v)
+	}
 }
